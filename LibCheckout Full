@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <string.h>
+
+// Define constants for the system
+#define FREE_DAYS 7
+#define FINE_PER_DAY 5.00f // Fine is 5.00 Philippine Pesos per day
+
+/**
+ * @brief Calculates the overdue fine based on the days borrowed.
+ * * Demonstrates: Function usage and simple arithmetic.
+ *
+ * @param days_borrowed The total number of days the book was kept.
+ * @return float The total fine amount. Returns 0.0f if not overdue.
+ */
+float calculateFine(int days_borrowed) {
+    // --- Selection (if statement) ---
+    if (days_borrowed > FREE_DAYS) {
+        // --- Arithmetic Operation ---
+        int overdue_days = days_borrowed - FREE_DAYS;
+        return overdue_days * FINE_PER_DAY;
+    }
+    return 0.0f;
+}
+
+/**
+ * @brief Main function for the Library Book Checkout System.
+ * * Demonstrates: Basic concepts, User Input, Data Types, Control Structures (Selection & Repetition).
+ */
+int main() {
+    // --- Data Types and Variables ---
+    // The number 100 sets the maximum length for the text variables.
+    char borrower_name[100];
+    char book_title[100];
+    int days_borrowed = 0;
+    float total_fine = 0.0f;
+    int choice;
+
+    // Display system title
+    printf("==================================================\n");
+    printf("   USTP Library Book Checkout Fine Calculator\n");
+    printf("==================================================\n");
+    printf("Borrowing Terms: Free for %d days. Fine is P%.2f per day after.\n\n", FREE_DAYS, FINE_PER_DAY);
+
+    // --- Repetition (Outer Loop: Start New Checkout) ---
+    do {
+        // Reset variables for a new transaction
+        days_borrowed = 0;
+        total_fine = 0.0f;
+
+        printf("--- New Checkout ---\n");
+
+        // --- User Input (String) ---
+        printf("Enter Borrower's Name: ");
+        if (fgets(borrower_name, 100, stdin) == NULL) {
+            printf("Error reading name.\n");
+            return 1;
+        }
+        borrower_name[strcspn(borrower_name, "\n")] = 0; // Remove trailing newline
+
+        printf("Enter Book Title: ");
+        if (fgets(book_title, 100, stdin) == NULL) {
+            printf("Error reading title.\n");
+            return 1;
+        }
+        book_title[strcspn(book_title, "\n")] = 0; // Remove trailing newline
+
+        // --- Repetition (Inner Loop for Input Validation) ---
+        // This loop ensures days_borrowed is a valid, non-negative number.
+        do {
+            printf("Enter Number of Days Book Was Kept: ");
+            if (scanf("%d", &days_borrowed) != 1) {
+                // Handle non-integer input gracefully
+                printf("[ERROR] Invalid input. Please enter a whole number of days.\n");
+                // Clear the input buffer
+                while (getchar() != '\n');
+                days_borrowed = -1; // Force the loop to continue
+            } else if (days_borrowed < 0) {
+                printf("[ERROR] Days kept cannot be negative. Please try again.\n");
+            }
+        } while (days_borrowed < 0);
+
+        // Clear the input buffer after reading the integer
+        while (getchar() != '\n');
+
+        // --- Fine Calculation (Function Call) ---
+        total_fine = calculateFine(days_borrowed);
+
+        printf("\n--- Transaction Summary ---\n");
+        printf("Borrower: %s\n", borrower_name);
+        printf("Book: %s\n", book_title);
+        printf("Days Kept: %d\n", days_borrowed);
+
+        // --- Control Structure (Selection: if-else) ---
+        if (total_fine > 0.0f) {
+            printf("Status: OVERDUE (%d days late)\n", days_borrowed - FREE_DAYS);
+            printf("TOTAL FINE DUE: P%.2f\n", total_fine);
+        } else {
+            printf("Status: ON TIME or EARLY\n");
+            printf("TOTAL FINE DUE: P0.00\n");
+        }
+        printf("---------------------------\n");
+
+
+        // Prompt to continue (End of Outer Loop)
+        printf("\nStart New Checkout? (1 for Yes, 0 for No): ");
+        if (scanf("%d", &choice) != 1) {
+            // Handle non-integer input for choice
+            printf("[ERROR] Invalid input, exiting system.\n");
+            choice = 0;
+        }
+        // Clear the input buffer
+        while (getchar() != '\n');
+
+    } while (choice == 1); // --- Repetition (Outer Loop End) ---
+
+    printf("\nThank you for using the Library System. Goodbye!\n");
+
+    return 0;
+}
